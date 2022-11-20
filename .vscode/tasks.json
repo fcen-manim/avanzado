@@ -12,13 +12,9 @@
                 "manim",
                 "-ql",
                 "${fileBasename}",
-                "Escena"
             ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
             "presentation": {
-                "reveal": "silent",
+                "reveal": "always",
                 "showReuseMessage": false,
                 "clear": true
             },
