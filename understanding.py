@@ -36,6 +36,7 @@ class Intro(Scene):
         self.add(a_inf)
         self.wait()
         self.play(FadeIn(MathTex(r"= 0").move_to(RIGHT*2.5)))
+        self.wait(3)
         self.clear()
 
 class Conv(Scene):
@@ -45,10 +46,13 @@ class Conv(Scene):
             y_range = [-2, 5, 1],
             tips = False
         )
-        title = MathTex(r"f_n(x) = \frac{x^2 + nx}{n}", color = BLUE_A)
+        title = MathTex(r"f_n(x) = \frac{x^2 + nx}{n}")
         f_n = VGroup()
         for n in range(1, 30, 5):
-            f_n += axes.plot(lambda x: (x ** 2 + n*x) / n, color = BLUE_A)
+            f_n += axes.plot(
+                lambda x: (x ** 2 + n*x) / n,
+                color = BLUE_A,
+            )
         f_n += axes.plot(lambda x: x, color = BLUE)
         self.play(Write(title))
         self.wait(3)
@@ -57,30 +61,45 @@ class Conv(Scene):
             GrowFromCenter(axes),
             Create(f_n[0])
         )
-        self.wait()
-        f_n_label = axes.get_graph_label(f_n[0], "n=1")
         plot = VGroup(axes, f_n.copy())
         for n in range(1, 6):
             self.play(
                 ReplacementTransform(f_n[n-1], f_n[n]),
-                Transform(f_n_label, axes.get_graph_label(f_n[0], f"n = {n}"))
             )
+            title.become(MathTex("f_%d(x) = \\frac{x^2 + %dx}{%d}"%(n, n, n), color = BLUE_A).to_corner(UP + LEFT))
         self.wait()
         self.play(
             ReplacementTransform(f_n[5], f_n[len(f_n) - 1]),
-            Transform(f_n_label, axes.get_graph_label(f_n[0], MathTex("n = \infty"), color = BLUE))
+            title.animate.become(MathTex(r"f_{\infty}(x) = \frac{x^2 + \infty \cdot x}{\infty}", color = BLUE_A).to_corner(UP + LEFT))
         )
         self.wait(2)
+        self.play(FadeOut(f_n[len(f_n) - 1]), FadeOut(axes), FadeOut(title))
         self.clear()
+
         converge = Text("¿Converge?")
         self.play(Write(converge))
         self.wait(2)
 
+        desarrollo = MathTex("f_{\\infty}(x) = \\frac{x^2 + \\infty \\cdot x}{\\infty} = ", "\\frac{1}{n}", "x^2 + ", "\\frac{n}{n}", "x")
+        c1 = SurroundingRectangle(desarrollo[1])
+        c2 = SurroundingRectangle(desarrollo[3])
         self.play(
             FadeOut(converge),
-            FadeIn(plot)
+            FadeIn(desarrollo[0])
         )
-        self.play(plot.animate.scale(1.5).move_to(UP*13.3 + LEFT*4))
+        self.wait(2)
+        self.play(Write(desarrollo[1:]))
+        self.wait()
+        self.play(Create(c1))
+        self.play(Create(c2))
+        self.wait()
+        self.remove(c1, c2)
+        self.play(Transform(desarrollo[1:], MathTex("x").move_to(RIGHT*1.6 + DOWN*0.1)))
+        self.wait(3)
+        self.clear()
+
+        self.play(FadeIn(plot))
+        self.play(plot.animate.scale(1.5).move_to(UP*13.3 + LEFT*3.2))
         self.wait()
         t = ValueTracker(1)
         vert = VGroup(
@@ -92,7 +111,7 @@ class Conv(Scene):
         vert[1].add_updater(lambda m: m.next_to(vert[0], DOWN))
         vert[2].add_updater(lambda m: m.next_to(vert[1]).set_value(t.get_value()))
         self.play(Create(vert))
-        self.wait(3)
+        self.wait(5)
         self.play(t.animate.set_value(2.5))
         self.wait()
         self.play(t.animate.set_value(3))
