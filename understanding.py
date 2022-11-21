@@ -59,7 +59,7 @@ class Conv(Scene):
         )
         self.wait()
         f_n_label = axes.get_graph_label(f_n[0], "n=1")
-        plot = VGroup(axes, f_n)
+        plot = VGroup(axes, f_n.copy())
         for n in range(1, 6):
             self.play(
                 ReplacementTransform(f_n[n-1], f_n[n]),
@@ -80,15 +80,15 @@ class Conv(Scene):
             FadeOut(converge),
             FadeIn(plot)
         )
-        self.play(plot.animate.scale(2).move_to(UP*0.5 + LEFT*6.5))
+        self.play(plot.animate.scale(1.5).move_to(UP*13.3 + LEFT*4))
         self.wait()
         t = ValueTracker(1)
         vert = VGroup(
-            axes.plot_line_graph([t.get_value()]*(len(f_n) + 2), [0, 10] + [(t.get_value() ** 2 + n*t.get_value()) / n for n in range(6, 30, 5)] + [t.get_value()], line_color = RED),
+            axes.plot_line_graph([t.get_value()]*(len(f_n) + 2), [0, 10] + [(t.get_value() ** 2 + n*t.get_value()) / n for n in range(1, 30, 5)] + [t.get_value()], line_color = RED),
             MathTex("x = ", color = RED),
             DecimalNumber(color = RED)
         )
-        vert[0].add_updater(lambda m: m.become(axes.plot_line_graph([t.get_value()]*(len(f_n) + 2), [0, 10] + [(t.get_value() ** 2 + n*t.get_value()) / n for n in range(6, 30, 5)] + [t.get_value()], line_color = RED)))
+        vert[0].add_updater(lambda m: m.become(axes.plot_line_graph([t.get_value()]*(len(f_n) + 2), [0, 10] + [(t.get_value() ** 2 + n*t.get_value()) / n for n in range(1, 30, 5)] + [t.get_value()], line_color = RED)))
         vert[1].add_updater(lambda m: m.next_to(vert[0], DOWN))
         vert[2].add_updater(lambda m: m.next_to(vert[1]).set_value(t.get_value()))
         self.play(Create(vert))
