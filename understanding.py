@@ -46,8 +46,8 @@ class Intro(Scene):
 class Conv(Scene):
     def construct(self):
         axes = Axes(
-            x_range = [-1, 8, 1],
-            y_range = [-1, 8, 1],
+            x_range = [-2, 8, 1],
+            y_range = [-2, 8, 1],
             tips = False
         )
         title = MathTex(r"f_n(x) = \frac{x^2 + nx}{n}")
@@ -58,8 +58,7 @@ class Conv(Scene):
                 color = BLUE,
             )
         f_n += axes.plot(lambda x: x, color = BLUE)
-        axes.move_to(LEFT)
-        # f_n.move_to(LEFT)
+        # axes.move_to(LEFT)
         self.play(Write(title))
         self.wait(3)
         self.play(
@@ -85,7 +84,8 @@ class Conv(Scene):
         self.play(Write(converge))
         self.wait(2)
 
-        desarrollo = MathTex("f_n(x) = \\frac{x^2 + nx}{n}", " = ", "\\frac{1}{n}", "x^2 + ", "\\frac{n}{n}", "x", " = x")
+        desarrollo = MathTex("f_n(x) = \\frac{x^2 + nx}{n}", " = ", "\\frac{1}{n}", "x^2 + ", "\\frac{n}{n}", "x", " \\rightarrow x")
+        desarrollo.set_color_by_tex(" \\rightarrow x", YELLOW)
         c1 = SurroundingRectangle(desarrollo[2])
         c2 = SurroundingRectangle(desarrollo[4])
         self.play(
@@ -108,23 +108,19 @@ class Conv(Scene):
         self.clear()
 
         self.play(FadeIn(plot))
-        self.play(plot.animate.scale(2).to_corner(LEFT))
-        self.wait()
-        t = ValueTracker(1)
+        self.play(plot.animate.scale(2, about_point=axes.c2p(0, 0)))
+        t = ValueTracker(0.5)
         vert = VGroup(
-            axes.plot_line_graph([t.get_value()]*(len(f_n) + 2), [0, 10] + [(t.get_value() ** 2 + n*t.get_value()) / n for n in range(1, 30, 5)] + [t.get_value()], line_color = RED),
+            axes.plot_line_graph([t.get_value()]*(len(f_n) + 3), [-10, 10] + [(t.get_value() ** 2 + n*t.get_value()) / n for n in range(1, 30, 5)] + [t.get_value()], line_color = RED),
             MathTex("x = ", color = RED),
             DecimalNumber(color = RED)
         )
-        vert[0].add_updater(lambda m: m.become(axes.plot_line_graph([t.get_value()]*(len(f_n) + 2), [0, 10] + [(t.get_value() ** 2 + n*t.get_value()) / n for n in range(1, 30, 5)] + [t.get_value()], line_color = RED)))
-        vert[1].add_updater(lambda m: m.next_to(vert[0], DOWN))
+        vert[0].add_updater(lambda m: m.become(axes.plot_line_graph([t.get_value()]*(len(f_n) + 3), [-10, 10] + [(t.get_value() ** 2 + n*t.get_value()) / n for n in range(1, 30, 5)] + [t.get_value()], line_color = RED)))
+        vert[1].add_updater(lambda m: m.move_to(axes.c2p(t.get_value(), 0) + RIGHT + DOWN))
         vert[2].add_updater(lambda m: m.next_to(vert[1]).set_value(t.get_value()))
+        self.wait()
         self.play(Create(vert))
         self.wait(5)
-        self.play(t.animate.set_value(2.5))
+        self.play(t.animate.set_value(1))
         self.wait()
         self.play(t.animate.set_value(3))
-        # for i in range(len(f_n) - 1):
-        #     plot[1].remove(f_n[0])
-        self.wait()
-        self.play(plot.animate.shift(LEFT*6))
