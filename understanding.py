@@ -17,13 +17,13 @@ class Intro(Scene):
         )
         self.play(Create(recta))
         self.wait()
-        a_n = MathTex(r"a_n = \frac{1}{n}", substrings_to_isolate = ["n"]).move_to(RIGHT)
+        a_n = MathTex(r"a_n = \frac{1}{n}").move_to(RIGHT)
         self.play(recta.animate.move_to(LEFT), Write(a_n))
         self.wait()
 
         n = ValueTracker(1)
         p = Dot(recta.n2p(1 / n.get_value()), color = RED)
-        self.play(a_n.animate.set_color_by_tex("n", RED), Create(p))
+        self.play(a_n[0][1].animate.set_color(RED), a_n[0][5].animate.set_color(RED), Create(p))
         self.wait()
         p.add_updater(lambda m: m.move_to(recta.n2p(1 / n.get_value()))) # (!) get shit together subindices rojos
         a_n.add_updater(lambda m: m.become(MathTex("a_{%d} = \\frac{1}{%d}"%(n.get_value(), n.get_value())).move_to(RIGHT)))
@@ -55,7 +55,7 @@ class Conv(Scene):
         for n in range(1, 30, 5):
             f_n += axes.plot(
                 lambda x: (x ** 2 + n*x) / n,
-                color = BLUE,
+                color = BLUE_A,
             )
         f_n += axes.plot(lambda x: x, color = BLUE)
         # axes.move_to(LEFT)
@@ -63,18 +63,20 @@ class Conv(Scene):
         self.wait(3)
         self.play(
             title.animate.to_corner(RIGHT),
+            title.animate.become(MathTex("f_%d(x) = \\frac{x^2 + %dx}{%d}"%(1, 1, 1), color = BLUE_A).to_corner(RIGHT)),
             Create(axes)
         )
         plot = VGroup(axes, f_n.copy())
+        self.play(Create(f_n[0]))
         for n in range(1, 6):
             self.play(
                 ReplacementTransform(f_n[n-1], f_n[n]),
             )
-            title.become(MathTex("f_%d(x) = \\frac{x^2 + %dx}{%d}"%(n, n, n), color = BLUE_A).to_corner(RIGHT))
+            title.become(MathTex("f_%d(x) = \\frac{x^2 + %dx}{%d}"%(n+1, n+1, n+1), color = BLUE_A).to_corner(RIGHT))
         self.wait()
         self.play(
             ReplacementTransform(f_n[5], f_n[len(f_n) - 1]),
-            title.animate.become(MathTex(r"f_{\infty}(x) = \frac{x^2 + \infty \cdot x}{\infty}", color = BLUE_A).to_corner(RIGHT))
+            title.animate.become(MathTex(r"f_{\infty}(x) = \frac{x^2 + \infty \cdot x}{\infty}", color = BLUE).to_corner(RIGHT))
         )
         self.wait(2)
         self.play(FadeOut(f_n[len(f_n) - 1]), FadeOut(axes), FadeOut(title))
@@ -84,8 +86,8 @@ class Conv(Scene):
         self.play(Write(converge))
         self.wait(2)
 
-        desarrollo = MathTex("f_n(x) = \\frac{x^2 + nx}{n}", " = ", "\\frac{1}{n}", "x^2 + ", "\\frac{n}{n}", "x", " \\rightarrow x")
-        desarrollo.set_color_by_tex(" \\rightarrow x", YELLOW)
+        desarrollo = MathTex("f_n(x) = \\frac{x^2 + nx}{n}", " = ", "\\frac{1}{n}", "x^2 + ", "\\frac{n}{n}", "x", "  \\rightarrow x")
+        desarrollo.set_color_by_tex("  \\rightarrow x", YELLOW)
         c1 = SurroundingRectangle(desarrollo[2])
         c2 = SurroundingRectangle(desarrollo[4])
         self.play(
