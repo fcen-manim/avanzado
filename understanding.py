@@ -3,7 +3,7 @@ from manim import *
 class Main(Scene):
     def construct(self):
         Intro.construct(self)
-        Conv.construct(self)
+        Puntual.construct(self)
 
 class Intro(Scene):
     def construct(self):
@@ -43,7 +43,7 @@ class Intro(Scene):
         self.wait(3)
         self.clear()
 
-class Conv(Scene):
+class Puntual(Scene):
     def construct(self):
         axes = Axes(
             x_range = [-2, 8, 1],
@@ -58,7 +58,6 @@ class Conv(Scene):
                 color = BLUE_A,
             )
         f_n += axes.plot(lambda x: x, color = BLUE)
-        # axes.move_to(LEFT)
         self.play(Write(title))
         self.wait(3)
         self.play(
@@ -107,6 +106,8 @@ class Conv(Scene):
         self.wait()
         self.play(Write(desarrollo[-1:]))
         self.wait(2)
+        self.play(Write(MathTex("\checkmark", color = GREEN).next_to(desarrollo[-1], RIGHT)))
+        self.wait()
         self.clear()
 
         self.play(FadeIn(plot))
@@ -120,9 +121,41 @@ class Conv(Scene):
         vert[0].add_updater(lambda m: m.become(axes.plot_line_graph([t.get_value()]*(len(f_n) + 3), [-10, 10] + [(t.get_value() ** 2 + n*t.get_value()) / n for n in range(1, 30, 5)] + [t.get_value()], line_color = RED)))
         vert[1].add_updater(lambda m: m.move_to(axes.c2p(t.get_value(), 0) + RIGHT + DOWN))
         vert[2].add_updater(lambda m: m.next_to(vert[1]).set_value(t.get_value()))
+        texto = VGroup(Arrow(start = ORIGIN, end = LEFT, color = BLUE).next_to(axes.c2p(t.get_value(), t.get_value())))
+        texto += Text("converge 'rápido'", color = BLUE).next_to(texto[0], RIGHT)
         self.wait()
         self.play(Create(vert))
-        self.wait(5)
-        self.play(t.animate.set_value(1))
+        self.wait()
+        self.play(Create(texto))
+        self.wait(2)
+        self.play(FadeOut(texto))
         self.wait()
         self.play(t.animate.set_value(3))
+        self.wait()
+        texto[0] = Arrow(start = ORIGIN, end = UP + RIGHT, color = BLUE).next_to(axes.c2p(t.get_value(), t.get_value()), LEFT + DOWN)
+        texto[1] = Text("converge 'lento'", color = BLUE).next_to(texto[0], DOWN*0.5 + LEFT)
+        self.play(Create(texto))
+        self.wait()
+
+        axes2 = Axes(
+            x_range = [-8, 2, 1],
+            y_range = [-2, 8, 1],
+            tips = False
+        )
+        title2 = MathTex(r"g_n = \frac{1}{n} - x")
+        g_n = VGroup()
+        for n in range(1, 5):
+            g_n += axes2.plot(
+                lambda x: 1/n - x,
+                color = BLUE_A,
+            )
+        g_n += axes2.plot(lambda x: -x, color = BLUE)
+        plot2 = VGroup(axes2, g_n.copy())
+        self.remove(texto, vert)
+        plot2.scale(2, about_point=axes2.c2p(0, 0))
+        plot2.scale(1/4, about_point=axes2.c2p(0, 0)).to_corner(RIGHT)
+        self.play(plot.animate.scale(1/4, about_point=axes.c2p(0, 0)).to_corner(LEFT), FadeIn(plot2))
+        self.wait()
+        title2.next_to(plot2, UP)
+        self.play(Write(title2))
+        self.wait()
