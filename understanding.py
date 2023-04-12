@@ -4,6 +4,7 @@ class Main(Scene):
     def construct(self):
         Intro.construct(self)
         Puntual.construct(self)
+        Uniforme.construct(self)
 
 class Intro(Scene):
     def construct(self):
@@ -142,14 +143,14 @@ class Puntual(Scene):
             y_range = [-2, 8, 1],
             tips = False
         )
-        title2 = MathTex(r"g_n = \frac{1}{n} - x")
+        title2 = MathTex(r"g_n = \frac{1}{n} - x", color = GREEN_A)
         g_n = VGroup()
         for n in range(1, 5):
             g_n += axes2.plot(
                 lambda x: 1/n - x,
-                color = BLUE_A,
+                color = GREEN_A,
             )
-        g_n += axes2.plot(lambda x: -x, color = BLUE)
+        g_n += axes2.plot(lambda x: -x, color = GREEN)
         plot2 = VGroup(axes2, g_n.copy())
         self.remove(texto, vert)
         plot2.scale(2, about_point=axes2.c2p(0, 0))
@@ -158,4 +159,56 @@ class Puntual(Scene):
         self.wait()
         title2.next_to(plot2, UP)
         self.play(Write(title2))
+        self.wait()
+        self.clear()
+
+class Uniforme(Scene):
+    def construct(self):
+        desarrollo = MathTex("g_n(x) = ", "\\frac{1}{n}", " - x", "  \\rightarrow -x")
+        desarrollo.set_color_by_tex("  \\rightarrow -x", YELLOW)
+        c = SurroundingRectangle(desarrollo[1])
+        self.play(Write(desarrollo[:-1]))
+        self.wait(2)
+        expl = MathTex("\\rightarrow 0", color = YELLOW).next_to(c, DOWN)
+        self.play(Create(expl), Write(desarrollo[-1:]), Create(c))
+        self.wait()
+        self.play(Write(MathTex("\checkmark", color = GREEN).next_to(desarrollo[-1], RIGHT)))
+        self.wait()
+        self.clear()
+
+        axes = Axes(
+            x_range = [-8, 2, 1],
+            y_range = [-2, 8, 1],
+            tips = False
+        )
+        title = MathTex(r"g_n = \frac{1}{n} - x")
+        g_n = VGroup()
+        for n in range(1, 5):
+            g_n += axes.plot(
+                lambda x: 1/n - x,
+                color = GREEN_A,
+            )
+        g_n += axes.plot(lambda x: -x, color = GREEN)
+        plot = VGroup(axes, g_n.copy())
+        self.play(Create(plot))
+        self.wait()
+
+        t = ValueTracker(-0.5)
+        vert = VGroup(
+            axes.plot_line_graph([t.get_value()]*(len(g_n) + 3), [-10, 10] + [1 / n - t.get_value() for n in range(1, 30, 5)] + [-t.get_value()], line_color = RED),
+            MathTex("x = ", color = RED),
+            DecimalNumber(color = RED)
+        )
+        vert[0].add_updater(lambda m: m.become(axes.plot_line_graph([t.get_value()]*(len(g_n) + 3), [-10, 10] + [1 / n - t.get_value() for n in range(1, 30, 5)] + [-t.get_value()], line_color = RED)))
+        vert[1].add_updater(lambda m: m.move_to(axes.c2p(t.get_value(), 0) + RIGHT + DOWN))
+        vert[2].add_updater(lambda m: m.next_to(vert[1]).set_value(t.get_value()))
+        texto = VGroup(Arrow(start = ORIGIN, end = RIGHT + UP, color = GREEN).next_to(axes.c2p(t.get_value(), -t.get_value())))
+        texto += Text("converge 'igual'", color = GREEN).next_to(texto[0], LEFT + DOWN)
+        texto.add_updater(lambda m: m.next_to(axes.c2p(t.get_value(), -t.get_value()), LEFT + DOWN))
+        self.wait()
+        self.play(Create(vert))
+        self.wait()
+        self.play(Create(texto))
+        self.wait()
+        self.play(t.animate.set_value(-4))
         self.wait()
