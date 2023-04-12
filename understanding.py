@@ -61,7 +61,7 @@ class Puntual(Scene):
             )
         f_n += axes.plot(lambda x: x, color = BLUE)
         self.play(Write(title))
-        self.wait(3)
+        self.wait(4)
         self.play(
             title.animate.to_corner(RIGHT),
             title.animate.become(MathTex("f_%d(x) = \\frac{x^2 + %dx}{%d}"%(1, 1, 1), color = BLUE_A).to_corner(RIGHT)),
@@ -160,7 +160,7 @@ class Puntual(Scene):
         self.wait()
         title2.next_to(plot2, UP)
         self.play(Write(title2))
-        self.wait()
+        self.wait(4)
         self.clear()
 
 class Uniforme(Scene):
@@ -171,9 +171,9 @@ class Uniforme(Scene):
         self.wait(2)
         expl = MathTex("\\rightarrow 0", color = YELLOW).next_to(c, DOWN)
         self.play(Create(expl), Write(desarrollo[-1:]), Create(c))
-        self.wait()
+        self.wait(4)
         self.play(Write(MathTex("\checkmark", color = GREEN).next_to(desarrollo[-1], RIGHT)))
-        self.wait()
+        self.wait(2)
         self.clear()
 
         axes = Axes(
@@ -181,7 +181,6 @@ class Uniforme(Scene):
             y_range = [-2, 8, 1],
             tips = False
         )
-        title = MathTex(r"g_n = \frac{1}{n} - x")
         g_n = VGroup()
         for n in range(1, 5):
             g_n += axes.plot(
@@ -211,7 +210,7 @@ class Uniforme(Scene):
         self.play(Create(texto))
         self.wait()
         self.play(t.animate.set_value(-4))
-        self.wait()
+        self.wait(2)
         self.clear()
 
 class Comparacion(Scene):
@@ -220,7 +219,81 @@ class Comparacion(Scene):
         self.play(Write(desarrollo[0]), Write(desarrollo[2:]))
         self.wait(2)
         self.play(Write(desarrollo[1]))
-        self.wait()
+        self.wait(4)
         self.play(desarrollo.animate.become(
             MathTex(r'f_n(x) = \frac{x^2 + nx}{n}  &\rightarrow x\\', r'&\neq\\', r'g_n(x) = \frac{1}{n} - x',  r'&\rightrightarrows', " -x").set_color_by_tex(r'&\rightrightarrows', YELLOW)
         ))
+        self.wait(2)
+        self.clear()
+        self.play(Write(MathTex("¿\\rightrightarrows?")))
+        self.wait(2)
+        self.clear()
+
+        axes = Axes(
+            x_range = [-1, 3, 1],
+            y_range = [-1, 3, 1],
+            tips = False
+        )
+        f_n = VGroup()
+        for n in range(1, 30, 5):
+            f_n += axes.plot(
+                lambda x: (x ** 2 + n*x) / n,
+                color = BLUE_A,
+            )
+        plot = VGroup(axes, f_n)
+        f_n += axes.plot(lambda x: x, color = BLUE)
+        axes2 = Axes(
+            x_range = [-3, 1, 1],
+            y_range = [-1, 3, 1],
+            tips = False
+        )
+        g_n = VGroup()
+        for n in range(1, 5):
+            g_n += axes2.plot(
+                lambda x: 1/n - x,
+                color = GREEN_A,
+            )
+        g_n += axes2.plot(lambda x: -x, color = GREEN)
+        plot2 = VGroup(axes2, g_n)
+        plot2.scale(1/2, about_point=axes2.c2p(0, 0)).to_corner(RIGHT + UP)
+        plot.scale(1/2, about_point=axes.c2p(0, 0)).shift(UP*2 + LEFT*2)
+        self.play(FadeIn(plot), FadeIn(plot2))
+
+        tg = ValueTracker(-1.5)
+        epsg = MathTex("(\hspace{0.5em})", color = RED).rotate(PI/3)
+        epsg.add_updater(lambda m: m.move_to(axes2.c2p(tg.get_value(), -tg.get_value())))
+        self.play(Create(epsg))
+        self.wait()
+        self.play(g_n[:2].animate.set_color(RED_A))
+        self.wait()
+        self.play(epsg.animate.become(MathTex("(\hspace{3em})", color = RED).rotate(PI/3)),
+                  g_n[:2].animate.set_color(GREEN_A))
+        self.wait()
+        self.play(tg.animate.set_value(-2.5))
+        self.play(tg.animate.set_value(0))
+        self.wait()
+        self.play(Write(MathTex("g_n(x) = \\frac{1}{n} - x \\rightrightarrows -x", "\\, \\checkmark", color = GREEN_A).set_color_by_tex(" \\checkmark", GREEN).next_to(plot2, DOWN)))
+        self.wait(2)
+
+        tf = ValueTracker(0.25)
+        epsf = MathTex("(\hspace{0.5em})", color = RED).rotate(-PI/3)
+        epsf.add_updater(lambda m: m.move_to(axes.c2p(tf.get_value(), tf.get_value())))
+        self.play(Create(epsf))
+        self.wait()
+        self.play(tf.animate.set_value(0.5),
+                  f_n[0].animate.set_color(RED_A))
+        self.wait()
+        self.play(epsf.animate.become(MathTex("(\hspace{1em})", color = RED).rotate(-PI/3)),
+                  f_n[0].animate.set_color(BLUE_A))
+        self.wait(DEFAULT_WAIT_TIME / 2)
+        self.play(tf.animate.set_value(1),
+                  f_n[0].animate.set_color(RED_A))
+        self.wait(DEFAULT_WAIT_TIME / 4)
+        self.play(epsf.animate.become(MathTex("(\hspace{2em})", color = RED).rotate(-PI/3)),
+                  f_n[0].animate.set_color(BLUE_A))
+        self.wait(DEFAULT_WAIT_TIME / 4)
+        self.play(tf.animate.set_value(2.5),
+                  f_n[:2].animate.set_color(RED_A))
+        self.wait()
+        self.play(Write(MathTex("f_n(x) = \\frac{x^2 + nx}{n} \\rightrightarrows x", "\\, \\chi", color = BLUE_A).set_color_by_tex("\\, \\chi", RED).next_to(plot, DOWN)))
+        self.wait(2)
