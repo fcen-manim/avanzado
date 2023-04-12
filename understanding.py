@@ -5,6 +5,7 @@ class Main(Scene):
         Intro.construct(self)
         Puntual.construct(self)
         Uniforme.construct(self)
+        Comparacion.construct(self)
 
 class Intro(Scene):
     def construct(self):
@@ -164,8 +165,7 @@ class Puntual(Scene):
 
 class Uniforme(Scene):
     def construct(self):
-        desarrollo = MathTex("g_n(x) = ", "\\frac{1}{n}", " - x", "  \\rightarrow -x")
-        desarrollo.set_color_by_tex("  \\rightarrow -x", YELLOW)
+        desarrollo = MathTex("g_n(x) = ", "\\frac{1}{n}", " - x", "  \\rightarrow -x").set_color_by_tex("  \\rightarrow -x", YELLOW)
         c = SurroundingRectangle(desarrollo[1])
         self.play(Write(desarrollo[:-1]))
         self.wait(2)
@@ -212,3 +212,15 @@ class Uniforme(Scene):
         self.wait()
         self.play(t.animate.set_value(-4))
         self.wait()
+        self.clear()
+
+class Comparacion(Scene):
+    def construct(self):
+        desarrollo = MathTex(r'f_n(x) = \frac{x^2 + nx}{n}  &\rightarrow x\\', r'&\neq\\', r'g_n(x) = \frac{1}{n} - x',  r'&\rightarrow', " -x")
+        self.play(Write(desarrollo[0]), Write(desarrollo[2:]))
+        self.wait(2)
+        self.play(Write(desarrollo[1]))
+        self.wait()
+        self.play(desarrollo.animate.become(
+            MathTex(r'f_n(x) = \frac{x^2 + nx}{n}  &\rightarrow x\\', r'&\neq\\', r'g_n(x) = \frac{1}{n} - x',  r'&\rightrightarrows', " -x").set_color_by_tex(r'&\rightrightarrows', YELLOW)
+        ))
