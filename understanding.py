@@ -46,8 +46,6 @@ class Intro(Scene):
         self.wait(2)
         a_n.clear_updaters()
         self.play(a_n.animate.become(MathTex("a_n", " \\rightarrow ", "0").set_color_by_tex(" \\rightarrow ", YELLOW).move_to(RIGHT)))
-        self.wait()
-        self.play(Write(Text("'Converge'").next_to(a_n, RIGHT*1.5)))
         self.wait(2)
         self.clear()
 
@@ -90,7 +88,7 @@ class Puntual(Scene):
         self.play(FadeOut(f_n[len(f_n) - 1]), FadeOut(axes), FadeOut(title))
         self.clear()
 
-        converge = Text("¿Converge?")
+        converge = MathTex("\\text{?`}\\rightarrow ?")
         self.play(Write(converge))
         self.wait(2)
 
@@ -210,7 +208,7 @@ class Comparacion(Scene):
         ))
         self.wait(2)
         self.clear()
-        self.play(Write(MathTex("\\text{?`} \\rightrightarrows ?")))
+        self.play(Write(MathTex("\\text{?`}\\rightrightarrows ?")))
         self.wait(2)
         self.clear()
 
