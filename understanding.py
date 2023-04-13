@@ -19,7 +19,7 @@ class Intro(Scene):
         )
         self.play(Create(recta))
         self.wait()
-        a_n = MathTex(r"a_n = \frac{1}{n}").move_to(RIGHT)
+        a_n = MathTex("a_n = \\frac{1}{n}").move_to(RIGHT)
         self.play(recta.animate.move_to(LEFT), Write(a_n))
         self.wait()
 
@@ -33,17 +33,16 @@ class Intro(Scene):
         self.play(n.animate.set_value(2))
         self.wait()
         self.play(n.animate.set_value(10))
-        self.wait()
-        a_inf = MathTex(r"a_{\infty} = \frac{1}{\infty}").move_to(RIGHT)
+        self.wait(0.5)
         self.play(n.animate.set_value(99))
-        self.remove(a_n)
-        self.add(a_inf)
-        self.remove(p)
-        self.add(Dot(recta.n2p(0), color = RED))
-        self.wait()
-        self.play(FadeIn(MathTex(r"= 0").move_to(RIGHT*2.5)))
-        self.wait(3)
+        self.wait(0.25)
+        self.play(p.animate.become(Dot(recta.n2p(0), color = RED)))
+        self.wait(2)
+        a_n.clear_updaters()
+        self.play(a_n.animate.become(MathTex("a_n", " \\rightarrow ", "0").set_color_by_tex(" \\rightarrow ", YELLOW).move_to(RIGHT)))
+        self.wait(2)
         self.clear()
+
 
 class Puntual(Scene):
     def construct(self):
