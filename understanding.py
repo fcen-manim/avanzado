@@ -46,6 +46,8 @@ class Intro(Scene):
         self.wait(2)
         a_n.clear_updaters()
         self.play(a_n.animate.become(MathTex("a_n", " \\rightarrow ", "0").set_color_by_tex(" \\rightarrow ", YELLOW).move_to(RIGHT)))
+        self.wait()
+        self.play(Write(Text("'Converge'").next_to(a_n, RIGHT*1.5)))
         self.wait(2)
         self.clear()
 
@@ -306,6 +308,6 @@ class Dini(Scene):
         title = MathTex("f_n(x) = \\frac{x^2 + nx}{n} \\rightrightarrows x", "\\quad \\chi").set_color_by_tex("\\quad \\chi", RED)
         self.play(Write(title))
         self.wait(2)
-        self.play(Write(MathTex("\\text{en } [a, b]").next_to(title, UP*2)))
+        self.play(Write(MathTex("\\text{monótona en } [a, b]").next_to(title, UP*2)))
         self.wait()
         self.play(title.animate.become(MathTex("f_n(x) = \\frac{x^2 + nx}{n} \\rightrightarrows x", "\\quad \\checkmark").set_color_by_tex("\\quad \\checkmark", GREEN)))
