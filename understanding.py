@@ -6,6 +6,7 @@ class Main(Scene):
         Puntual.construct(self)
         Uniforme.construct(self)
         Comparacion.construct(self)
+        Dini.construct(self)
 
 def graficar_funciones(func, rango = range(1, 30, 5), x_r = [-4, 4, 1], y_r = [-4, 4, 1], color = WHITE):
         axes = Axes(x_range = x_r, y_range = y_r, tips = False)
@@ -258,3 +259,53 @@ class Comparacion(Scene):
         self.play(Write(MathTex("f_n(x) = \\frac{x^2 + nx}{n} \\rightrightarrows x", "\\, \\chi", color = BLUE_A).set_color_by_tex("\\, \\chi", RED).next_to(plot, DOWN)))
         self.wait(2)
         self.clear()
+
+class Dini(Scene):
+    def construct(self):
+        teodini = Text("Teorema de Dini")
+        self.play(Write(teodini))
+        self.wait(2)
+
+        plot = graficar_funciones(lambda n, x: (x ** 2 + n*x) / n, range(1, 30, 5), [-1, 3, 1], [-1, 3, 1], BLUE_A)
+        plot[1] += plot[0].plot(lambda x: x, color = BLUE)
+        self.play(FadeOut(teodini), FadeIn(plot))
+        self.wait(0.5)
+        compacto = MathTex("[", "]", color = BLUE, width = 10)
+        compacto[0].move_to(plot[0].c2p(0.02, 0))
+        compacto[1].move_to(plot[0].c2p(0.98, 0))
+        self.play(Create(compacto))
+        self.wait(0.5)
+        axes = Axes(x_range = [0, 1, 1], y_range = [0, 1, 1], tips = False)
+        f_n = VGroup(*[axes.plot(lambda x: (x ** 2 + n*x) / n, color = BLUE_A) for n in range(1, 30, 5)])
+        f_n += axes.plot(lambda x: x, color = BLUE)
+        f_n.scale(1/4).move_to(plot[0].c2p(0.5, 1))
+        self.play(FadeOut(plot[1]), FadeIn(f_n))
+        self.wait(2)
+
+        tf = ValueTracker(0.25)
+        epsf = MathTex("(\hspace{0.5em})", color = RED).rotate(-PI/3)
+        epsf.add_updater(lambda m: m.move_to(plot[0].c2p(tf.get_value(), tf.get_value())))
+        self.play(Create(epsf))
+        self.wait()
+        self.play(epsf.animate.become(MathTex("(\hspace{2em})", color = RED).rotate(-PI/3)))
+        self.wait(0.25)
+        self.play(tf.animate.set_value(0.8),
+                  f_n[0].animate.set_color(RED_A))
+        self.wait(0.25)
+        self.play(epsf.animate.become(MathTex("(\hspace{8em})", color = RED).rotate(-PI/3)),
+                  f_n[0].animate.set_color(BLUE_A))
+        self.wait(0.5)
+        self.play(tf.animate.set_value(1))
+        self.wait(0.125)
+        self.play(tf.animate.set_value(0))
+        self.wait(0.125)
+        self.play(tf.animate.set_value(1))
+        self.wait()
+        self.clear()
+
+        title = MathTex("f_n(x) = \\frac{x^2 + nx}{n} \\rightrightarrows x", "\\quad \\chi").set_color_by_tex("\\quad \\chi", RED)
+        self.play(Write(title))
+        self.wait(2)
+        self.play(Write(MathTex("\\text{en } [a, b]").next_to(title, UP*2)))
+        self.wait()
+        self.play(title.animate.become(MathTex("f_n(x) = \\frac{x^2 + nx}{n} \\rightrightarrows x", "\\quad \\checkmark").set_color_by_tex("\\quad \\checkmark", GREEN)))
