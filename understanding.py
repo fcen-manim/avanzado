@@ -7,6 +7,11 @@ class Main(Scene):
         Uniforme.construct(self)
         Comparacion.construct(self)
 
+def graficar_funciones(func, rango = range(1, 30, 5), x_r = [-4, 4, 1], y_r = [-4, 4, 1], color = WHITE):
+        axes = Axes(x_range = x_r, y_range = y_r, tips = False)
+        f_n = VGroup(*[axes.plot(lambda x: func(n, x), color = color) for n in rango])
+        return VGroup(axes, f_n)
+
 class Intro(Scene):
     def construct(self):
         recta = NumberLine(
@@ -138,23 +143,12 @@ class Puntual(Scene):
         self.play(Create(texto))
         self.wait()
 
-        axes2 = Axes(
-            x_range = [-8, 2, 1],
-            y_range = [-2, 8, 1],
-            tips = False
-        )
+        plot2 = graficar_funciones(lambda n, x: 1/n - x, range(1, 5), [-8, 2, 1], [-2, 8, 1], GREEN_A)
+        plot2[1] += plot2[0].plot(lambda x: -x, color = GREEN)
         title2 = MathTex(r"g_n = \frac{1}{n} - x", color = GREEN_A)
-        g_n = VGroup()
-        for n in range(1, 5):
-            g_n += axes2.plot(
-                lambda x: 1/n - x,
-                color = GREEN_A,
-            )
-        g_n += axes2.plot(lambda x: -x, color = GREEN)
-        plot2 = VGroup(axes2, g_n.copy())
         self.remove(texto, vert)
-        plot2.scale(2, about_point=axes2.c2p(0, 0))
-        plot2.scale(1/4, about_point=axes2.c2p(0, 0)).to_corner(RIGHT)
+        plot2.scale(2, about_point=plot2[0].c2p(0, 0))
+        plot2.scale(1/4, about_point=plot2[0].c2p(0, 0)).to_corner(RIGHT)
         self.play(plot.animate.scale(1/4, about_point=axes.c2p(0, 0)).to_corner(LEFT), FadeIn(plot2))
         self.wait()
         title2.next_to(plot2, UP)
@@ -175,34 +169,23 @@ class Uniforme(Scene):
         self.wait(2)
         self.clear()
 
-        axes = Axes(
-            x_range = [-8, 2, 1],
-            y_range = [-2, 8, 1],
-            tips = False
-        )
-        g_n = VGroup()
-        for n in range(1, 5):
-            g_n += axes.plot(
-                lambda x: 1/n - x,
-                color = GREEN_A,
-            )
-        g_n += axes.plot(lambda x: -x, color = GREEN)
-        plot = VGroup(axes, g_n.copy())
+        plot = graficar_funciones(lambda n, x: 1/n - x, range(1, 5), [-8, 2, 1], [-2, 8, 1], GREEN_A)
+        plot[1] += plot[0].plot(lambda x: -x, color = GREEN)
         self.play(Create(plot))
         self.wait()
 
         t = ValueTracker(-0.5)
         vert = VGroup(
-            axes.plot_line_graph([t.get_value()]*(len(g_n) + 3), [-10, 10] + [1 / n - t.get_value() for n in range(1, 30, 5)] + [-t.get_value()], line_color = RED),
+            plot[0].plot_line_graph([t.get_value()]*(len(plot[1]) + 3), [-10, 10] + [1 / n - t.get_value() for n in range(1, 30, 5)] + [-t.get_value()], line_color = RED),
             MathTex("x = ", color = RED),
             DecimalNumber(color = RED)
         )
-        vert[0].add_updater(lambda m: m.become(axes.plot_line_graph([t.get_value()]*(len(g_n) + 3), [-10, 10] + [1 / n - t.get_value() for n in range(1, 30, 5)] + [-t.get_value()], line_color = RED)))
-        vert[1].add_updater(lambda m: m.move_to(axes.c2p(t.get_value(), 0) + RIGHT + DOWN))
+        vert[0].add_updater(lambda m: m.become(plot[0].plot_line_graph([t.get_value()]*(len(plot[1]) + 3), [-10, 10] + [1 / n - t.get_value() for n in range(1, 30, 5)] + [-t.get_value()], line_color = RED)))
+        vert[1].add_updater(lambda m: m.move_to(plot[0].c2p(t.get_value(), 0) + RIGHT + DOWN))
         vert[2].add_updater(lambda m: m.next_to(vert[1]).set_value(t.get_value()))
-        texto = VGroup(Arrow(start = ORIGIN, end = RIGHT + UP, color = GREEN).next_to(axes.c2p(t.get_value(), -t.get_value())))
+        texto = VGroup(Arrow(start = ORIGIN, end = RIGHT + UP, color = GREEN).next_to(plot[0].c2p(t.get_value(), -t.get_value())))
         texto += Text("converge 'igual'", color = GREEN).next_to(texto[0], LEFT + DOWN)
-        texto.add_updater(lambda m: m.next_to(axes.c2p(t.get_value(), -t.get_value()), LEFT + DOWN))
+        texto.add_updater(lambda m: m.next_to(plot[0].c2p(t.get_value(), -t.get_value()), LEFT + DOWN))
         self.wait()
         self.play(Create(vert))
         self.wait()
@@ -224,49 +207,27 @@ class Comparacion(Scene):
         ))
         self.wait(2)
         self.clear()
-        self.play(Write(MathTex("¿\\rightrightarrows?")))
+        self.play(Write(MathTex("\\text{?`} \\rightrightarrows ?")))
         self.wait(2)
         self.clear()
 
-        axes = Axes(
-            x_range = [-1, 3, 1],
-            y_range = [-1, 3, 1],
-            tips = False
-        )
-        f_n = VGroup()
-        for n in range(1, 30, 5):
-            f_n += axes.plot(
-                lambda x: (x ** 2 + n*x) / n,
-                color = BLUE_A,
-            )
-        plot = VGroup(axes, f_n)
-        f_n += axes.plot(lambda x: x, color = BLUE)
-        axes2 = Axes(
-            x_range = [-3, 1, 1],
-            y_range = [-1, 3, 1],
-            tips = False
-        )
-        g_n = VGroup()
-        for n in range(1, 5):
-            g_n += axes2.plot(
-                lambda x: 1/n - x,
-                color = GREEN_A,
-            )
-        g_n += axes2.plot(lambda x: -x, color = GREEN)
-        plot2 = VGroup(axes2, g_n)
-        plot2.scale(1/2, about_point=axes2.c2p(0, 0)).to_corner(RIGHT + UP)
-        plot.scale(1/2, about_point=axes.c2p(0, 0)).shift(UP*2 + LEFT*2)
+        plot = graficar_funciones(lambda n, x: (x ** 2 + n*x) / n, range(1, 30, 5), [-1, 3, 1], [-1, 3, 1], BLUE_A)
+        plot[1] += plot[0].plot(lambda x: x, color = BLUE)
+        plot2 = graficar_funciones(lambda n, x: 1/n - x, range(1, 5), [-3, 1, 1], [-1, 3, 1], GREEN_A)
+        plot2[1] += plot2[0].plot(lambda x: -x, color = GREEN)
+        plot2.scale(1/2, about_point=plot2[0].c2p(0, 0)).to_corner(RIGHT + UP)
+        plot.scale(1/2, about_point=plot[0].c2p(0, 0)).shift(UP*2 + LEFT*2)
         self.play(FadeIn(plot), FadeIn(plot2))
 
         tg = ValueTracker(-1.5)
         epsg = MathTex("(\hspace{0.5em})", color = RED).rotate(PI/3)
-        epsg.add_updater(lambda m: m.move_to(axes2.c2p(tg.get_value(), -tg.get_value())))
+        epsg.add_updater(lambda m: m.move_to(plot2[0].c2p(tg.get_value(), -tg.get_value())))
         self.play(Create(epsg))
         self.wait()
-        self.play(g_n[:2].animate.set_color(RED_A))
+        self.play(plot2[1][:2].animate.set_color(RED_A))
         self.wait()
         self.play(epsg.animate.become(MathTex("(\hspace{3em})", color = RED).rotate(PI/3)),
-                  g_n[:2].animate.set_color(GREEN_A))
+                  plot2[1][:2].animate.set_color(GREEN_A))
         self.wait()
         self.play(tg.animate.set_value(-2.5))
         self.play(tg.animate.set_value(0))
@@ -276,23 +237,24 @@ class Comparacion(Scene):
 
         tf = ValueTracker(0.25)
         epsf = MathTex("(\hspace{0.5em})", color = RED).rotate(-PI/3)
-        epsf.add_updater(lambda m: m.move_to(axes.c2p(tf.get_value(), tf.get_value())))
+        epsf.add_updater(lambda m: m.move_to(plot[0].c2p(tf.get_value(), tf.get_value())))
         self.play(Create(epsf))
         self.wait()
         self.play(tf.animate.set_value(0.5),
-                  f_n[0].animate.set_color(RED_A))
+                  plot[1][0].animate.set_color(RED_A))
         self.wait()
         self.play(epsf.animate.become(MathTex("(\hspace{1em})", color = RED).rotate(-PI/3)),
-                  f_n[0].animate.set_color(BLUE_A))
+                  plot[1][0].animate.set_color(BLUE_A))
         self.wait(DEFAULT_WAIT_TIME / 2)
         self.play(tf.animate.set_value(1),
-                  f_n[0].animate.set_color(RED_A))
+                  plot[1][0].animate.set_color(RED_A))
         self.wait(DEFAULT_WAIT_TIME / 4)
         self.play(epsf.animate.become(MathTex("(\hspace{2em})", color = RED).rotate(-PI/3)),
-                  f_n[0].animate.set_color(BLUE_A))
+                  plot[1][0].animate.set_color(BLUE_A))
         self.wait(DEFAULT_WAIT_TIME / 4)
         self.play(tf.animate.set_value(2.5),
-                  f_n[:2].animate.set_color(RED_A))
+                  plot[1][:2].animate.set_color(RED_A))
         self.wait()
         self.play(Write(MathTex("f_n(x) = \\frac{x^2 + nx}{n} \\rightrightarrows x", "\\, \\chi", color = BLUE_A).set_color_by_tex("\\, \\chi", RED).next_to(plot, DOWN)))
         self.wait(2)
+        self.clear()
